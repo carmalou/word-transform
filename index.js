@@ -21,23 +21,18 @@ function appendToProgress() {
 
 function makeXMLReq(endpoint, tmpWord) {
   var tmpEndpoint = tmpWord ? endpoint + tmpWord : endpoint;
-  var request = new XMLHttpRequest();
-  request.open('GET', tmpEndpoint, true);
-
-  request.onreadystatechange = function() {
-    if (this.readyState === 4) {
-      if (this.status >= 200 && this.status < 400) {
-        progressIndicator('Stop');
-        word_result.innerHTML = this.responseText;
-      } else {
-        progressIndicator('Stop');
-        word_result.innerHTML = 'Error! ' + this.statusText;
-      }
-    }
-  };
-
-  request.send();
-  request = null;
+  window.fetch(tmpEndpoint)
+    .then(function(response) {
+      return response.text();
+    })
+    .then(function(response) {
+      progressIndicator('Stop');
+      word_result.innerHTML = response;
+    })
+    .catch(function(err) {
+      progressIndicator('Stop');
+      word_result.innerHTML = 'Error! ' + err;
+    })
 }
 
 function getWord() {
