@@ -5,9 +5,9 @@ var getWordURL = 'https://company.oseberg.io/interview/word_generator.php';
 var transformWordURL = 'https://company.oseberg.io/interview/shifter.php?word=';
 var myInterval;
 
-function progressIndicator(startStop) {
+function progressIndicator(startStop, progressText) {
   if(startStop == 'Start') {
-    word_result.innerHTML = 'Please wait for word.'
+    word_result.innerHTML = progressText;
     myInterval = setInterval(appendToProgress, 1000);
   } else {
     clearInterval(myInterval);
@@ -19,46 +19,36 @@ function appendToProgress() {
   word_result.innerHTML = word_result.innerHTML + '.';
 }
 
-function getWord() {
-  progressIndicator('Start');
+function makeXMLReq(endpoint, tmpWord) {
+  var tmpEndpoint = tmpWord ? endpoint + tmpWord : endpoint;
   var request = new XMLHttpRequest();
-  request.open('GET', getWordURL, true);
+  request.open('GET', tmpEndpoint, true);
 
   request.onreadystatechange = function() {
     if (this.readyState === 4) {
       if (this.status >= 200 && this.status < 400) {
-        // Success!
-        var resp = this.responseText;
-        console.log(resp);
+        progressIndicator('Stop');
+        word_result.innerHTML = this.responseText;
       } else {
-        // Error :(
+        progressIndicator('Stop');
+        word_result.innerHTML = 'Error! ' + this.statusText;
       }
     }
   };
 
   request.send();
   request = null;
-  // window.fetch(getWordURL, {method: 'GET', mode:'cors'})
-  //   .then(function(response) {
-  //     console.log('response ', response);
-  //     console.log('data?? ', response.data);
-  //     progressIndicator('Stop');
-  //   })
-  //   .catch(function(err) {
-  //     console.log('err ', err);
-  //     progressIndicator('Stop');
-  //   });
+}
+
+function getWord() {
+  progressIndicator('Start', 'Please wait for word.');
+  makeXMLReq(getWordURL)
 }
 
 function transformWord() {
   var tmpWord = word_result.innerHTML;
-  window.fetch(transformWordURL + tmpWord)
-    .then(function(response) {
-      console.log('response ', response);
-    })
-    .catch(function(err) {
-      console.log('err ', err);
-    });
+  progressIndicator('Start', 'Please wait for transformation.');
+  makeXMLReq(transformWordURL, tmpWord)
 }
 
 generateBtn.addEventListener('click', getWord);
