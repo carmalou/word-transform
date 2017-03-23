@@ -19,7 +19,7 @@ function appendToProgress() {
   word_result.innerHTML = word_result.innerHTML + '.';
 }
 
-function makeXMLReq(endpoint, tmpWord) {
+function fetchData(endpoint, tmpWord) {
   var tmpEndpoint = tmpWord ? endpoint + tmpWord : endpoint;
   window.fetch(tmpEndpoint)
     .then(function(response) {
@@ -37,13 +37,13 @@ function makeXMLReq(endpoint, tmpWord) {
 
 function getWord() {
   progressIndicator('Start', 'Please wait for word.');
-  makeXMLReq(getWordURL)
+  fetchData(getWordURL)
 }
 
 function transformWord() {
   var tmpWord = word_result.innerHTML;
   progressIndicator('Start', 'Please wait for transformation.');
-  makeXMLReq(transformWordURL, tmpWord)
+  fetchData(transformWordURL, tmpWord)
 }
 
 generateBtn.addEventListener('click', getWord);
